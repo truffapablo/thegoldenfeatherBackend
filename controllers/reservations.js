@@ -28,6 +28,7 @@ const getReservations = async (req, res = response) => {
             ok: true,
             serverDate:moment(),
             serverDateTZ:today(),
+            serverTZ:tz,
             length:reservations.length? reservations.length:null,
             primeraReserva:moment.utc(reservations[0].date).format('YYYY-MM-DD'),
             filter : [iniDay(today()), endDay(today())],
