@@ -5,7 +5,7 @@ const { types } = require('../types/types');
 
 const getTransferReservations = async (req, res = response) => {
     try{
-        const transferR = await TransferReservation.find({date: {$gte: iniDay(today()), $lte: endDay(today())}}).populate('user', 'name');
+        const transferR = await TransferReservation.find({date: {$eq:today()}}).populate('user', 'name');
         return res.status(200).json({
             ok: true,
             transferR

@@ -6,15 +6,11 @@ const Event = require("../models/Event");
 const { iniDay, endDay, today } = require("../helpers/today");
 
 const moment = require('moment-timezone');
-const tz = moment().tz("America/Argentina/Buenos_Aires");
 
 
 const getReservations = async (req, res = response) => {
     try {
-        console.log('SERVER-DATE', moment());
-        console.log('SERVER-DATE-TZ', today());
-        
-        const reservations = await Reservation.find({date: {$gte: iniDay(today()), $lte: endDay(today())}})
+        const reservations = await Reservation.find({date: {$eq:today()}})
         .populate('user', 'name')
         .populate('event',['title','price','currency','start','end','location','address','city']);
         
@@ -26,11 +22,8 @@ const getReservations = async (req, res = response) => {
         }
         res.status(200).json({
             ok: true,
-            serverDate:moment(),
-            serverDateTZ:today(),
-            serverTZ:tz,
-            length:reservations.length? reservations.length:null,
-            primeraReserva:moment.utc(reservations[0].date).format('YYYY-MM-DD'),
+            hoy:today(),
+            serverConHora:moment().format('YYYY-MM-DD hh:mm A'),
             filter : [iniDay(today()), endDay(today())],
             reservations,
         });

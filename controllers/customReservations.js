@@ -12,7 +12,7 @@ const getCustomReservations = async (req, res = response) => {
 
 
     try {
-        const reservations = await CustomReservation.find({date: {$gte: iniDay(today()), $lte: endDay(today())}})
+        const reservations = await CustomReservation.find({date: {$eq:today()}})
         .populate('user', 'name')
         
         if (reservations.length === 0) {

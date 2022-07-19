@@ -1,5 +1,4 @@
-const moment = require('moment-timezone');
-const tz = moment().tz("America/Argentina/Buenos_Aires");
+const moment = require('moment');
 
 const iniDay = (date) => {
     if(date){
@@ -31,7 +30,7 @@ const endDay = (date) => {
   };
 
 const today = () => {
-  return tz.format('YYYY-MM-DD');
+  return moment().format('YYYY-MM-DD');
 
 }
 
