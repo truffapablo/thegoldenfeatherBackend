@@ -4,33 +4,34 @@ const { check } = require('express-validator');
 const Event = require('../models/Event');
 const Reservation = require('../models/Reservation');
 
+const moment = require('moment');
+
 const router = express.Router();
 
 
-router.get('/:id', async (req, res = response) => {
-
-    const event = await Event.findById(req.params.id);
-    
-    if (!event) {
-        return res.status(404).json({
-            ok: false,
-            message: 'No existe el evento',
-        });
-    }
+router.get('/reservations', async (req, res = response) => {
 
     /**
-     * Buscar las reservas que tengan asociado el evento
+     * Establecer la fecha en la que llega la peticion
+     * Esto debe venir de la hora y fecha del usuario que hace la peticion y no de la del server.
      */
 
-    const reservations = await Reservation.find({ 'event._id': event._id });
-    await Reservation.deleteMany({ 'event._id': event._id });
-    await event.remove();
-    res.status(200).json({
-        ok: true,
-        event:event.title,
-        reservations
-    });
-          
+    const data = req.body;
+    
+    const {dateuser} = data;
+    
+    const reservations = await Reservation.find({date:dateuser});
+
+
+    return res.status(200).json({
+        ok:true,
+        reservations,
+        /* today: moment(dateuser),
+        now:moment(),
+        tommorrow: moment(dateuser).add(1, 'day'),
+        yesterday: moment(dateuser).subtract(1, 'day') */
+    })
+
 
 })
 

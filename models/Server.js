@@ -47,6 +47,7 @@ class Server {
     }
 
     routes(){
+        this.app.use('/api/testing', require('../routes/testingRoute'));
         this.app.use('/api/auth', require('../routes/auth'));
         this.app.use('/api/events', require('../routes/events'));
         this.app.use('/api/transfer', require('../routes/transfer'));
