@@ -1,5 +1,7 @@
 const { response } = require('express');
 const { iniDay, endDay, today } = require("../helpers/today");
+const { transporter } = require('../mailer/config');
+const { transferReservationMail } = require('../mailer/reservation');
 const TransferReservation = require('../models/TransferReservation');
 const { types } = require('../types/types');
 
@@ -77,6 +79,17 @@ const confirmTransferReservation = async (req, res = response) => {
                     message: 'Transfer no encontrado',
                 });
             }
+
+            if(transferR.email) {
+                
+                let emailBody = transferReservationMail(transferR);
+                await transporter.sendMail({
+                    from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                    to: `"${transferR.email}"`, // list of receivers
+                    subject: "Confirmación de reserva", // Subject line
+                    html: emailBody, // html body
+                  });            
+            }
             
             return res.status(200).json({
                 ok: true,
@@ -130,6 +143,18 @@ const cancelTransferReservation = async (req, res = response) => {
                     message: 'Transfer no encontrado',
                 });
             }
+
+            if(transferR.email) {
+                
+                let emailBody = transferReservationMail(transferR);
+                await transporter.sendMail({
+                    from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                    to: `"${transferR.email}"`, // list of receivers
+                    subject: "Cancelación de reserva", // Subject line
+                    html: emailBody, // html body
+                  });            
+            }
+
             return res.status(200).json({
                 ok: true,
                 message: 'Transfer cancelado',

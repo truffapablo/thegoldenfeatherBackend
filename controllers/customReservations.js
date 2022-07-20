@@ -4,6 +4,8 @@ const Log = require("../models/Log");
 const CustomReservation = require("../models/CustomReservation");
 const { trackChanges } = require("../helpers/trackChanges");
 const { iniDay, endDay, today } = require("../helpers/today");
+const { customReservationMail } = require("../mailer/reservation");
+const { transporter } = require("../mailer/config");
 
 
 
@@ -150,6 +152,17 @@ const confirmCustomReservation = async (req, res = response) => {
         });
         await log.save();
 
+        if(updatedReservation.email) {
+                
+            let emailBody = customReservationMail(updatedReservation);
+            await transporter.sendMail({
+                from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                to: `"${updatedReservation.email}"`, // list of receivers
+                subject: "Confirmación de reserva", // Subject line
+                html: emailBody, // html body
+              });            
+        }
+
         return res.status(200).json({
                 ok: true,
                 message: types.reservationConfirmed,
@@ -184,6 +197,17 @@ const cancelCustomReservation = async (req, res = response) => {
             date: new Date().toLocaleString(),
         });
         await log.save();
+
+        if(cancelledReservation.email) {
+                
+            let emailBody = customReservationMail(cancelledReservation);
+            await transporter.sendMail({
+                from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                to: `"${cancelledReservation.email}"`, // list of receivers
+                subject: "Cancelación de reserva", // Subject line
+                html: emailBody, // html body
+              });            
+        }
 
         return res.status(200).json({
                 ok: true,

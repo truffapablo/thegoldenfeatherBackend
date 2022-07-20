@@ -1,3 +1,4 @@
+const { transporter } = require("../mailer/config");
 const { response } = require("express");
 const Reservation = require("../models/Reservation");
 const { types } = require("../types/types");
@@ -6,6 +7,7 @@ const Event = require("../models/Event");
 const { iniDay, endDay, today } = require("../helpers/today");
 
 const moment = require('moment-timezone');
+const { eventReservationMail } = require("../mailer/reservation");
 
 
 const getReservations = async (req, res = response) => {
@@ -171,6 +173,18 @@ const confirmReservation = async (req, res = response) => {
                 date: new Date().toLocaleString(),
             });
             await log.save();
+
+            if(updatedReservation.email) {
+                
+                let emailBody = eventReservationMail(updatedReservation);
+                await transporter.sendMail({
+                    from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                    to: `"${updatedReservation.email}"`, // list of receivers
+                    subject: "Confirmación de reserva", // Subject line
+                    html: emailBody, // html body
+                  });            
+            }
+
     
             return res.status(200).json({
                     ok: true,
@@ -209,6 +223,17 @@ const cancelReservation = async (req, res = response) => {
             date: new Date().toLocaleString(),
         });
         await log.save();
+
+        if(cancelledReservation.email) {
+                
+            let emailBody = eventReservationMail(cancelledReservation);
+            await transporter.sendMail({
+                from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
+                to: `"${cancelledReservation.email}"`, // list of receivers
+                subject: "Cancelación de reserva", // Subject line
+                html: emailBody, // html body
+              });            
+        }
 
         return res.status(200).json({
                 ok: true,
