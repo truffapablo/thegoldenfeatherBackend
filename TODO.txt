@@ -1,5 +1,2 @@
-NOTAS
-==========================
-
-Estados de las reservas de transfer / personalizadas o estandar deben ser iguales.
-Esto es para que los middleware filtren por lo mismo.
+LOGS
+==================================

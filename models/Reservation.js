@@ -22,8 +22,7 @@ const ReservationSchema = new Schema({
     },
     email: {
         type: String,
-        required: false,
-        default: null,
+        required: true,
         unique: false
     },
     date:{

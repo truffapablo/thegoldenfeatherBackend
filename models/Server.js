@@ -57,6 +57,7 @@ class Server {
         this.app.use('/api/search-reservations', require('../routes/searchReservations'));
         this.app.use('/api/logs', require('../routes/logs'));
         this.app.use('/api/reservation-status', require('../routes/reservationStatus'));
+        this.app.use('/api/mail-client', require('../routes/mailClient'));
         this.app.use('/api/seeder', require('../routes/seeder'));
 
         /**
