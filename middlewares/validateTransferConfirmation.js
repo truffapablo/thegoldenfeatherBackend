@@ -19,8 +19,6 @@ const validateTransferConfirmation = async (req, res, next) => {
             message: `El estado debe ser (${types.reservationPending}) para poder confirmar.`,
         });
     }
-
-    console.log('PASO EL MIDDLEWARE DE CONFIRMACION');
     next();
 }
 
