@@ -22,15 +22,13 @@ const EventSchema = new Schema({
         required: true,
         default: 'USD'
     },
+    date:{
+        type: Date,
+        required: false
+     },
     schedule:{
-        /**
-         * Dias de la semana en que se realiza el evento
-         * TODO: 
-         * 1. Agregar opciones para que el usuario pueda elegir los dias de la semana
-         * 2. Cambiar el tipo de dato para que levante un array de strings
-         */
-        type: String,
-        required: true
+        type: Array,
+        required: false
      },
     start : {
         type: String,

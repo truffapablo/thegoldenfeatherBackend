@@ -26,7 +26,9 @@ const mailToClient = async (req, res = response) => {
         }
         
         let emailBody = eventReservationMail(reservation);
-        sendMailAction(emailBody, reservation.email)
+        sendMailAction(emailBody, reservation.email).then(rta=>{
+            console.log('Envio de mail: ', rta);
+        })
         return res.status(200).json({
             ok: true,
             message: 'Email enviado',
@@ -63,7 +65,7 @@ const mailToClient = async (req, res = response) => {
         }
         
         let transferemailBody = transferReservationMail(transferreservation);
-        sendMailAction(transferemailBody, transferreservation.email)
+        sendMailAction(transferemailBody, transferreservation.email);
         return res.status(200).json({
             ok: true,
             message: 'Email enviado',
@@ -90,12 +92,13 @@ const mailToClient = async (req, res = response) => {
 
 
 const sendMailAction = async (emailBody, email) => {
-    await transporter.sendMail({
+    let sendmail = await transporter.sendMail({
         from: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // sender address
         to: `"${email}"`, // list of receivers
         subject: "Info Reserva", // Subject line
         html: emailBody, // html body
       });
+    return sendmail;
 }
 
 module.exports = {
