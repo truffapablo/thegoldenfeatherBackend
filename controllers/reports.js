@@ -5,9 +5,10 @@ const CustomReservation = require("../models/CustomReservation");
 const TransferReservation = require("../models/TransferReservation");
 const Reservation = require("../models/Reservation");
 const { iniDay, endDay, today } = require("../helpers/today");
+const { aggregate } = require('../models/CustomReservation');
 
 
-const getTodayReservations = async (req, res = response) => {
+const getTodayReport = async (req, res = response) => {
     
 
     try {
@@ -40,6 +41,177 @@ const getTodayReservations = async (req, res = response) => {
 }
 
 
+const getReportByDate = async (req, res = response) => {
+    const {from, to} = req.body;
+
+    try {
+        const eventReservations = await Reservation.find({date: {$gte:from, $lte:to}})
+        const customReservations = await CustomReservation.find({date: {$gte:from, $lte:to}})
+        const transferReservations = await TransferReservation.find({date: {$gte:from, $lte:to}})
+        return res.status(200).json({
+            ok:true,
+            message:'Reportes de reservas por fecha',
+            from,
+            to,
+            reservation_quantity : {
+                event: eventReservations.length,
+                custom: customReservations.length,
+                transfer: transferReservations.length,
+            },
+
+            reservation_status: getReservationStatus([...eventReservations,...customReservations,...transferReservations]),
+
+            revenue: generateEconomicCalc([...eventReservations,...customReservations,...transferReservations])  
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            error
+        })
+    }
+
+
+}
+
+const getReportsByYear = async (req, res = response) => {
+    /**
+     * {$group: {
+                _id: {$month: "$date"}, 
+                numberofbookings: {$sum: 1},
+                //commission: {$sum}
+                
+            }}
+     */
+}
+
+
+const getReportsByMonth = async (req, res = response) => {
+    
+    const month = parseInt(req.body.month);
+
+    try {
+        const eventReservations = await Reservation.aggregate([
+            {
+                $project: {
+                    //commission: {$multiply:["$event.commission", "$peopleQuantity"]},
+                    day: {$dayOfMonth: '$date'} ,
+                    month: {$month: '$date'} , 
+                    year: {$year:'$date'},
+                    date:'$date',
+                    status:'$status',
+                    peopleQuantity:'$peopleQuantity',
+                    commission:'$commission',
+                    pattern:'$pattern',
+                    event:'$event',
+                    
+                }
+            },
+            {$match: {month}},
+        ]);
+
+        const customReservations = await CustomReservation.aggregate([
+            
+            {
+                $project: {
+                    //commission: {$multiply:["$event.commission", "$peopleQuantity"]},
+                    day: {$dayOfMonth: '$date'} ,
+                    month: {$month: '$date'} , 
+                    year: {$year:'$date'},
+                    date:'$date',
+                    status:'$status',
+                    peopleQuantity:'$peopleQuantity',
+                    commission:'$commission',
+                    pattern:'$pattern',
+                    event:'$event',
+                    
+                }
+            },
+            {$match: {month}},
+        ]);
+
+        const transferReservations = await TransferReservation.aggregate([
+            
+            {
+                $project: {
+                    //commission: {$multiply:["$event.commission", "$peopleQuantity"]},
+                    day: {$dayOfMonth: '$date'} ,
+                    month: {$month: '$date'} , 
+                    year: {$year:'$date'},
+                    date:'$date',
+                    status:'$status',
+                    peopleQuantity:'$peopleQuantity',
+                    commission:'$commission',
+                    pattern:'$pattern',
+                    
+                }
+            },
+            {$match: {month}},
+        ]);
+
+        return res.status(200).json({
+            ok:true,
+            length:{
+                event:eventReservations.length,
+                custom:customReservations.length,
+                transfer:transferReservations.length,
+            },
+            profit: {
+                event: generateEconomicCalcByDayInMonth(eventReservations)
+            },
+            month,
+            //transferReservations,
+            eventReservations,
+            //revenue: generateEconomicCalc([...eventReservations,...customReservations,...transferReservations])
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            error
+        })
+    }
+}
+
+
+
+const generateEconomicCalcByDayInMonth = (reservations) => {
+    let eventDays = [];
+
+    reservations.map(reservation =>{
+        switch (reservation.pattern) {
+            case 'EVENT_RESERVATION':
+                eventDays = addCommisionToDay(eventDays, reservation)
+                break;
+
+            default:
+                break;
+        }
+    });
+
+    return eventDays;
+
+}
+
+const addCommisionToDay = (days = [], data) => {
+    
+    let day = days.find((d) => d.day === data.day);
+
+    if (!day) {
+        days.push({
+            day:data.day,
+            total: data.event.commission * data.peopleQuantity
+        });
+    } else {
+        day.total += data.event.commission * data.peopleQuantity;
+    }
+
+    return days;
+}
+
+
 const generateEconomicCalc = (reservations) => {
     
     let profit = {
@@ -53,23 +225,32 @@ const generateEconomicCalc = (reservations) => {
         custom  : 0,
         transfer: 0,
     }
+    
+    let estimated_profit = {
+        event   : 0,
+        custom  : 0,
+        transfer: 0,
+    }
 
     reservations.map(reservation => {
         switch (reservation.pattern) {
             case 'EVENT_RESERVATION':
-                profit.event += calculateEventReservationProfit(reservation);
-                economic_loss.event += calculateEventReservationLoss(reservation);
+                profit.event                += calculateEventReservationProfit(reservation);
+                economic_loss.event         += calculateEventReservationLoss(reservation);
+                estimated_profit.event      += calculateEventReservationEstimatedProfit(reservation);
                 break;
-            
+                
             case 'CUSTOM_RESERVATION':
-                profit.custom += calculateCustomReservationProfit(reservation);
-                economic_loss.custom += calculateCustomReservationLoss(reservation);
+                profit.custom               += calculateCustomReservationProfit(reservation);
+                economic_loss.custom        += calculateCustomReservationLoss(reservation);
+                estimated_profit.custom     += calculateCustomReservationEstimatedProfit(reservation);
                 break;
                 
             case 'TRANSFER_RESERVATION':
-                profit.transfer += calculateTransferReservationProfit(reservation);
-                economic_loss.transfer += calculateTransferReservationLoss(reservation);
-                break;
+                profit.transfer             += calculateTransferReservationProfit(reservation);
+                economic_loss.transfer      += calculateTransferReservationLoss(reservation);
+                estimated_profit.transfer   += calculateTransferReservationEstimatedProfit(reservation);
+            break;
             default:
                 break;
         }
@@ -77,7 +258,8 @@ const generateEconomicCalc = (reservations) => {
 
     return {
         profit,
-        economic_loss
+        economic_loss,
+        estimated_profit
     }
 }
 
@@ -136,6 +318,17 @@ const calculateEventReservationLoss = (reservation) => {
     return 0;
 }
 
+const calculateEventReservationEstimatedProfit = (reservation) => {
+    const {status, peopleQuantity} = reservation;
+    const {commission} = reservation.event;
+    
+    if (status !== types.reservationCancelled){
+        return commission * peopleQuantity;
+
+    }   
+    return 0;
+}
+
 const calculateCustomReservationProfit = (reservation) => {
     const {status, commission} = reservation;
     
@@ -150,6 +343,16 @@ const calculateCustomReservationLoss = (reservation) => {
     const {status, commission} = reservation;
     
     if (status === types.reservationCancelled){
+        return  commission;
+    }
+
+    return 0;
+} 
+
+const calculateCustomReservationEstimatedProfit = (reservation) => {
+    const {status, commission} = reservation;
+    
+    if (status !== types.reservationCancelled){
         return  commission;
     }
 
@@ -176,76 +379,18 @@ const calculateTransferReservationLoss = (reservation) => {
     return 0;
 } 
 
-/**
- * 
-
-Reportes
-=========================================
-
-[Input Fecha]
-
-Pantalla inicial
-+ Reporte del dia
-    +Ganancias
-    +Perdidas
-    +Ganancias pendientes
-
-+ Detalles
-
-    Reservas de Eventos
-    ===================
-    +Ganancias
-    +Perdidas
-    +Ganancias pendientes
-        +Estados:
-        =========
-        +Pendientes
-        +Confirmadas
-        +Completadas
-        +Canceladas
-
+const calculateTransferReservationEstimatedProfit = (reservation) => {
     
-    Reservas personalizadas
-    ===================
-    +Ganancias
-    +Perdidas
-    +Ganancias pendientes
-        +Estados:
-        =========
-        +Pendientes
-        +Confirmadas
-        +Completadas
-        +Canceladas
-    
-    Reservas de transfer
-    ===================
-    +Ganancias
-    +Perdidas
-    +Ganancias pendientes
-        +Estados:
-        =========
-        +Pendientes
-        +Confirmadas
-        +Completadas
-        +Canceladas
+    const {status, commission} = reservation;
+    if (status !== types.reservationCancelled){
+        return commission;
+    }
 
-+ Usuarios registrados
-+ Usuarios sin acceso
-
-[Boton para imprimir las reservas del dia seleccionado]
-
-Reporte Mensual
-Reporte Anual
-
-Usuario con mayor cantidad de ventas
-    +Diaria
-    +Mensual
-    +Anual
-
- */
-
-
+    return 0;
+} 
 
 module.exports = {
-    getTodayReservations
+    getTodayReport,
+    getReportByDate,
+    getReportsByMonth
 }

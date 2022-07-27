@@ -12,7 +12,7 @@ const nextWeek  = moment().add(1,'week').format('YYYY-MM-DD');
 const reservationSeeder = (events, id) => {
     return [
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+1,
             firstName:      'Pablo',
             lastName:       'Truffa',
             event:           events[0],
@@ -24,7 +24,7 @@ const reservationSeeder = (events, id) => {
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+2,
             firstName:      'Ricardo',
             lastName:       'Perez',
             event:           events[1],
@@ -36,7 +36,7 @@ const reservationSeeder = (events, id) => {
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+3,
             firstName:      'Micaela',
             lastName:       'Vega',
             event:           events[2],
@@ -48,7 +48,7 @@ const reservationSeeder = (events, id) => {
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+4,
             firstName:      'Fernanda',
             lastName:       'Salazar',
             event:           events[0],
@@ -60,7 +60,7 @@ const reservationSeeder = (events, id) => {
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+5,
             firstName:      'Federico',
             lastName:       'Notox',
             event:           events[0],

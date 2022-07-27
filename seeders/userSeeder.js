@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs/dist/bcrypt");
 const role = require("../types/role");
 
+
 const userSeeder = async () =>{
     const salt = await bcrypt.genSaltSync(10);
     const password = await bcrypt.hashSync("123456", salt);

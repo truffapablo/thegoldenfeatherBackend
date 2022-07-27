@@ -3,7 +3,7 @@ const { types } = require('../types/types');
 
 const TransferReservationSchema = new Schema({
     confirmation:{
-        type: String,
+        type: Number,
         required: true,
         unique: true,
     },

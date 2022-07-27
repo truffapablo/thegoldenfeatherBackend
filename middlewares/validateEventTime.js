@@ -3,16 +3,9 @@ const Event = require("../models/Event");
 
 const validateEventTime = async (req, res, next) => {
 
-    const {event, time, date} = req.body;
+    const {event, time} = req.body;
     const dbEvent = await Event.findById(event);
 
-    if(date < moment().format('YYYY-MM-DD')) {
-        return res.status(400).json({
-            ok: false,
-            message: 'No se puede hacer una reserva con una fecha pasada.',
-        });
-    }
-    
 
     if (!dbEvent) {
         return res.status(400).json({

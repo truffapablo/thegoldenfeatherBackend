@@ -3,7 +3,7 @@ const {Schema, model} = require('mongoose');
 const { types } = require('../types/types');
 const ReservationSchema = new Schema({
     confirmation:{
-        type: String,
+        type: Number,
         required: true,
         unique: true,
     },

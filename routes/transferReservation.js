@@ -8,6 +8,7 @@ const { validateTransferConfirmation } = require('../middlewares/validateTransfe
 const { validateTransferEdition } = require('../middlewares/validateTransferEdition');
 const { validateTransferCancelation } = require('../middlewares/validateTransferCancelation');
 const { userAccess } = require('../middlewares/userAccess');
+const { validateDate } = require('../middlewares/validateDate');
 
 router.use(validateJWT);
 router.use(userAccess);
@@ -31,6 +32,7 @@ router.post('/', [
     check('information', 'La información debe tener un mínimo de 10 caracteres y máximo de 500').isLength({ min:10, max:500 }).optional({ checkFalsy: true, nullable:true }),
     
     validateFields,
+    validateDate
 
 ], createTransferReservation);
 
@@ -52,6 +54,7 @@ router.put('/:id', [
     check('information', 'La información debe tener un mínimo de 10 caracteres y máximo de 500').isLength({ min:10, max:500 }).optional({ checkFalsy: true, nullable:true }),
     
     validateFields,
+    validateDate
 
 ], updateTransferReservation);
 

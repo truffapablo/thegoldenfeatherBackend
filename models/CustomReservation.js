@@ -4,11 +4,10 @@ const { types } = require('../types/types');
 
 const CustomReservationSchema = new Schema({
     confirmation:{
-        type: String,
+        type: Number,
         required: true,
         unique: true,
     },
-
     firstName: {
         type: String,
         required: true,

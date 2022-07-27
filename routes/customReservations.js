@@ -13,6 +13,7 @@ const { validateCustomCompletion } = require('../middlewares/validateCustomCompl
 const { validateCustomEdition } = require('../middlewares/validateCustomEdition');
 const { validateCustomCancelation } = require('../middlewares/validateCustomCancelation');
 const { userAccess } = require('../middlewares/userAccess');
+const { validateDate } = require('../middlewares/validateDate');
 
 router.use(validateJWT);
 router.use(userAccess);
@@ -33,6 +34,7 @@ router.post('/',[
     check('peopleQuantity', 'La cantidad de personas es obligatoria').isNumeric(),
     check('roomNumber', 'El numero de habitación es obligatorio').isNumeric(),
     validateFields,
+    validateDate
 ], createCustomReservation);
 
 router.put('/:id',[
@@ -49,7 +51,8 @@ router.put('/:id',[
     check('peopleQuantity', 'La cantidad de personas es obligatoria').isNumeric(),
     check('roomNumber', 'El numero de habitación es obligatorio').isNumeric(),
     validateFields,
-    validateCustomEdition
+    validateCustomEdition,
+    validateDate
 ], updateCustomReservation);
 
 router.patch('/:id/confirm', [

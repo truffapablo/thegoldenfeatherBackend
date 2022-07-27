@@ -15,6 +15,7 @@ const { validateCancelation } = require('../middlewares/validateCancelation');
 const { isAdmin } = require('../middlewares/isAdmin');
 const { changePassword } = require('../middlewares/changePassword');
 const { userAccess } = require('../middlewares/userAccess');
+const { validateDate } = require('../middlewares/validateDate');
 
 
 /**
@@ -41,6 +42,7 @@ router.post('/',[
     
     validateFields,
     validateEventTime,
+    validateDate
 ], createReservation);
 
 
@@ -55,6 +57,7 @@ router.put('/:id',[
     validateFields,
     validateEventTime,
     validateEdition,
+    validateDate
     
 ], updateReservation);
 

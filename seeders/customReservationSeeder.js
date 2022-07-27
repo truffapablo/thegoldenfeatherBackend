@@ -4,7 +4,7 @@ const tz = moment().tz("America/Argentina/Buenos_Aires");
 const customReservationSeeder = (id) =>{
     return [
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+20,
             firstName:      'Pablo',
             lastName:       'Truffa',
             event:          'Sushi Club Palermo',
@@ -19,7 +19,7 @@ const customReservationSeeder = (id) =>{
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+21,
             firstName:      'Micaela',
             lastName:       'Vega',
             event:          'Kika Club',
@@ -34,7 +34,7 @@ const customReservationSeeder = (id) =>{
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+22,
             firstName:      'Ricargo',
             lastName:       'Gomez',
             event:          'Jardin Japones',
@@ -49,7 +49,7 @@ const customReservationSeeder = (id) =>{
             user:           id,
         },
         {
-            confirmation:   new Date().getTime(),
+            confirmation:   moment().unix()+23,
             firstName:      'Lucia Jazmin',
             lastName:       'Lareo',
             event:          'Fiesta Bresh',
