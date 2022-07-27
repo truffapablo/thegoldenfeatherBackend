@@ -152,18 +152,18 @@ const getReportsByMonth = async (req, res = response) => {
 
         return res.status(200).json({
             ok:true,
+            month,
             length:{
                 event:eventReservations.length,
                 custom:customReservations.length,
                 transfer:transferReservations.length,
             },
-            profit: {
-                event: generateEconomicCalcByDayInMonth(eventReservations)
+            revenue_detail: {
+                event: generateEconomicCalcByDayInMonth(eventReservations),
+                custom: generateEconomicCalcByDayInMonth(customReservations),
+                transfer: generateEconomicCalcByDayInMonth(transferReservations),
             },
-            month,
-            //transferReservations,
-            eventReservations,
-            //revenue: generateEconomicCalc([...eventReservations,...customReservations,...transferReservations])
+            revenue_overview: generateEconomicCalc([...eventReservations,...customReservations,...transferReservations])
         })
         
     } catch (error) {
@@ -178,34 +178,199 @@ const getReportsByMonth = async (req, res = response) => {
 
 
 const generateEconomicCalcByDayInMonth = (reservations) => {
+    
+    
     let eventDays = [];
+    let revenue = {
+        profit:[],
+        loss:[],
+        estimated:[],
+    }
 
     reservations.map(reservation =>{
-        switch (reservation.pattern) {
-            case 'EVENT_RESERVATION':
-                eventDays = addCommisionToDay(eventDays, reservation)
-                break;
-
-            default:
-                break;
-        }
+        eventDays = addCommisionToDay(revenue, reservation, reservation.pattern)
     });
 
     return eventDays;
 
 }
 
-const addCommisionToDay = (days = [], data) => {
+
+const addCommisionToDay = (revenue, data, pattern) => {
+    
+        switch (data.status) {
+            case types.reservationCompleted:
+                
+                let comp_day = revenue.profit.find((d) => d.day === data.day);
+                if (!comp_day) {
+
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.profit.push({
+                            day:data.day,
+                            total: data.event.commission * data.peopleQuantity
+                        });
+                    }else{
+                        revenue.profit.push({
+                            day:data.day,
+                            total: data.commission
+                        });
+                    }
+
+                } else {
+                    
+                    let dayIndex = revenue.profit.indexOf(comp_day);
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.profit.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: comp_day.total + data.event.commission * data.peopleQuantity
+                        });
+                        
+                    }else{
+                        revenue.profit.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: comp_day.total + data.commission
+                        });
+
+                    }
+                }
+                break;
+
+            case types.reservationCancelled:
+                
+                let cxl_day = revenue.loss.find((d) => d.day === data.day);
+                if (!cxl_day) {
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.loss.push({
+                            day:data.day,
+                            total: data.event.commission * data.peopleQuantity
+                        });
+                        
+                    }else{
+                        revenue.loss.push({
+                            day:data.day,
+                            total: data.commission
+                        });
+                    }
+                } else {
+                    
+                    let dayIndex = revenue.loss.indexOf(cxl_day);
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.loss.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: cxl_day.total + data.event.commission * data.peopleQuantity
+                        });
+                        
+                    }else{
+                        revenue.loss.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: cxl_day.total + data.commission
+                        });
+                    }
+                }
+                break;
+                
+            case types.reservationPending:
+                    
+                let pp_day = revenue.estimated.find((d) => d.day === data.day);
+                if (!pp_day) {
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.estimated.push({
+                            day:data.day,
+                            total: data.event.commission * data.peopleQuantity
+                        });
+
+                    }
+                    else{
+                        revenue.estimated.push({
+                            day:data.day,
+                            total: data.commission
+                        });
+                    }
+                } else {
+                    
+                    let dayIndex = revenue.estimated.indexOf(pp_day);
+                    if(pattern == 'EVENT_RESERVATION'){
+                        revenue.estimated.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: pp_day.total + data.event.commission * data.peopleQuantity
+                        });
+                    }
+                    else{
+                        revenue.estimated.splice(dayIndex, 1, {
+                            day:data.day,
+                            total: pp_day.total + data.commission
+                        });
+
+                    }
+                }
+                break;
+            case types.reservationConfirmed:
+                    
+                    let cc_day = revenue.estimated.find((d) => d.day === data.day);
+                    if (!cc_day) {
+                        if(pattern == 'EVENT_RESERVATION'){
+                            revenue.estimated.push({
+                                day:data.day,
+                                total: data.event.commission * data.peopleQuantity
+                            });
+                            
+                        }
+                        else{
+                            revenue.estimated.push({
+                                day:data.day,
+                                total: data.commission
+                            });
+                        }
+                    } else {
+                        let dayIndex = revenue.estimated.indexOf(cc_day);
+                        if(pattern == 'EVENT_RESERVATION'){
+                            revenue.estimated.splice(dayIndex, 1, {
+                                day:data.day,
+                                total: cc_day.total + data.event.commission * data.peopleQuantity
+                            });
+                            
+                        }
+                        else{
+                            revenue.estimated.splice(dayIndex, 1, {
+                                day:data.day,
+                                total: cc_day.total + data.commission
+                            });
+                        }
+                    }
+                break;
+        
+            default:
+                break;
+        }
+    return revenue;
+}
+
+const addCommisionToCustomDay = (days = [], data) => {
     
     let day = days.find((d) => d.day === data.day);
 
     if (!day) {
         days.push({
             day:data.day,
-            total: data.event.commission * data.peopleQuantity
+            total: data.commission
         });
     } else {
-        day.total += data.event.commission * data.peopleQuantity;
+        day.total += data.commission;
+    }
+
+    return days;
+}
+const addCommisionToTransferDay = (days = [], data) => {
+    
+    let day = days.find((d) => d.day === data.day);
+
+    if (!day) {
+        days.push({
+            day:data.day,
+            total: data.commission
+        });
+    } else {
+        day.total += data.commission;
     }
 
     return days;
