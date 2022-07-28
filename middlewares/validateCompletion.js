@@ -25,7 +25,7 @@ const validateCompletion = async (req, res, next) => {
      * Si se puede completar una reserva pasada.
      */
 
-    if(moment(reservation.date).format('YYYY-MM-DD') >= today() ) {
+    if(moment(reservation.date).format('YYYY-MM-DD') > today() ) {
         return res.status(400).json({
             ok: false,
             message: `No se puede completar una reserva con una fecha futura.`,

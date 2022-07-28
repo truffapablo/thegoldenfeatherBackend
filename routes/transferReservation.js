@@ -9,6 +9,7 @@ const { validateTransferEdition } = require('../middlewares/validateTransferEdit
 const { validateTransferCancelation } = require('../middlewares/validateTransferCancelation');
 const { userAccess } = require('../middlewares/userAccess');
 const { validateDate } = require('../middlewares/validateDate');
+const { validateTransferCompletion } = require('../middlewares/validateTransferCompletion');
 
 router.use(validateJWT);
 router.use(userAccess);
@@ -62,7 +63,7 @@ router.patch('/:id/confirm',[
     validateTransferConfirmation,
 ] ,confirmTransferReservation);
 router.patch('/:id/complete', [
-    validateTransferEdition,
+    validateTransferCompletion,
 ],completeTransferReservation);
 
 router.delete('/:id',[

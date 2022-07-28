@@ -1,10 +1,10 @@
 const moment = require("moment") ;
 const {today}  = require("../helpers/today");
-const CustomReservation = require("../models/CustomReservation");
+const TransferReservation = require("../models/TransferReservation");
 const { types } = require("../types/types");
-const validateCustomCompletion = async (req, res, next) => {
+const validateTransferCompletion = async (req, res, next) => {
 
-    const reservation = await CustomReservation.findById(req.params.id);
+    const reservation = await TransferReservation.findById(req.params.id);
     if(!reservation){
         return res.status(404).json({
             ok: false,
@@ -25,7 +25,7 @@ const validateCustomCompletion = async (req, res, next) => {
      * Si se puede completar una reserva pasada.
      */
 
-     if(moment(reservation.date).format('YYYY-MM-DD') > today() ) {
+    if(moment(reservation.date).format('YYYY-MM-DD') > today() ) {
         return res.status(400).json({
             ok: false,
             message: `No se puede completar una reserva con una fecha futura.`,
@@ -36,5 +36,5 @@ const validateCustomCompletion = async (req, res, next) => {
 }
 
 module.exports = {
-    validateCustomCompletion
+    validateTransferCompletion
 }
