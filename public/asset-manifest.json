@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.a8bf2a82.css",
-    "main.js": "/static/js/main.2d7bd8d7.js",
+    "main.js": "/static/js/main.332c245c.js",
     "static/media/frontdesk.jpg": "/static/media/frontdesk.ae22be207ee5601302fa.jpg",
     "static/media/timeless-webfont.woff": "/static/media/timeless-webfont.611b1c25716792ca5b35.woff",
     "static/media/timeless-webfont.woff2": "/static/media/timeless-webfont.1280ce62b7e11b9d3d12.woff2",
@@ -9,10 +9,10 @@
     "static/media/timeless-bold-webfont.woff2": "/static/media/timeless-bold-webfont.15d240fdfc50c5187de4.woff2",
     "index.html": "/index.html",
     "main.a8bf2a82.css.map": "/static/css/main.a8bf2a82.css.map",
-    "main.2d7bd8d7.js.map": "/static/js/main.2d7bd8d7.js.map"
+    "main.332c245c.js.map": "/static/js/main.332c245c.js.map"
   },
   "entrypoints": [
     "static/css/main.a8bf2a82.css",
-    "static/js/main.2d7bd8d7.js"
+    "static/js/main.332c245c.js"
   ]
 }

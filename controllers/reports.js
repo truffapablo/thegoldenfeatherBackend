@@ -44,6 +44,8 @@ const getTodayReport = async (req, res = response) => {
 const getReportByDate = async (req, res = response) => {
     const {from, to} = req.body;
 
+    console.log(from,to);
+
     try {
         const eventReservations = await Reservation.find({date: {$gte:from, $lte:to}})
         const customReservations = await CustomReservation.find({date: {$gte:from, $lte:to}})
@@ -180,13 +182,18 @@ const getReportsByMonth = async (req, res = response) => {
 const generateEconomicCalcByDayInMonth = (reservations) => {
     
     
+    
+    
     let eventDays = [];
     let revenue = {
         profit:[],
         loss:[],
         estimated:[],
     }
-
+    
+    if(reservations.length === 0){
+        return revenue;
+    }
     reservations.map(reservation =>{
         eventDays = addCommisionToDay(revenue, reservation, reservation.pattern)
     });
@@ -197,7 +204,7 @@ const generateEconomicCalcByDayInMonth = (reservations) => {
 
 
 const addCommisionToDay = (revenue, data, pattern) => {
-    
+
         switch (data.status) {
             case types.reservationCompleted:
                 
