@@ -12,12 +12,18 @@ router.use(userAccess);
 
 
 router.get('/', [], getTodayReport);
+
+router.get('/:uid', [], getTodayReport);
+
+
 router.post('/date', [
     check('from', 'La fecha es obligatoria').isDate(),
     check('to', 'La fecha es obligatoria').isDate(),
-
     validateFields
 ], getReportByDate);
+
+
+
 router.post('/month', [
 
     check('month', 'El número del mes es obligatorio y debe ser entre 1 y 12').isInt({min:1, max:12}),
