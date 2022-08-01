@@ -11,7 +11,6 @@ const mongoose = require('mongoose');
 
 const getTodayReport = async (req, res = response) => {
 
-    
     try {
 
         let searchFilter;
@@ -30,7 +29,7 @@ const getTodayReport = async (req, res = response) => {
         const transferReservations = await TransferReservation.find(searchFilter)
         return res.status(200).json({
             ok:true,
-            message:'Reportes de reservas',
+            message:'Reportes de reservas diario',
             reservation_quantity : {
                 event: eventReservations.length,
                 custom: customReservations.length,
@@ -114,8 +113,10 @@ const getReportsByYear = async (req, res = response) => {
 const getReportsByMonth = async (req, res = response) => {
     
     const month = parseInt(req.body.month);
+    const year = parseInt(req.body.year);
 
     let searchFilter;
+    let transferFilter;
         if(req.query.uid){
 
             const paramId = mongoose.Types.ObjectId(req.query.uid);
@@ -133,18 +134,26 @@ const getReportsByMonth = async (req, res = response) => {
                     event:'$event',
                     email:'$email',
                     user:'$user'
-                    
+                    }
+                },{$match: {month,year,user:paramId}}
+            ]
+
+            transferFilter =[{
+                $project: {
+                    day: {$dayOfMonth: '$date'} ,
+                    month: {$month: '$date'} , 
+                    year: {$year:'$date'},
+                    date:'$date',
+                    status:'$status',
+                    peopleQuantity:'$peopleQuantity',
+                    commission:'$commission',
+                    pattern:'$pattern',
+                    user:'$user'
                     
                 }
             },
-            {
-                $match: {
-                    month,
-                    user:paramId
-                }
-                
-            }
-        ]
+            {$match: {month,year,user:paramId}}
+        ];
     
         }else{
             searchFilter = [{
@@ -161,17 +170,9 @@ const getReportsByMonth = async (req, res = response) => {
                     
                 }
             },
-            {$match: {month}},]
-        }
+            {$match: {month,year}},]
 
-    try {
-        const eventReservations = await Reservation.aggregate(searchFilter);
-
-        const customReservations = await CustomReservation.aggregate(searchFilter);
-
-        const transferReservations = await TransferReservation.aggregate([
-            
-            {
+            transferFilter =[{
                 $project: {
                     day: {$dayOfMonth: '$date'} ,
                     month: {$month: '$date'} , 
@@ -184,11 +185,22 @@ const getReportsByMonth = async (req, res = response) => {
                     
                 }
             },
-            {$match: {month}},
-        ]);
+            {$match: {month,year}}
+        ];
+
+            
+        }
+
+    try {
+        const eventReservations = await Reservation.aggregate(searchFilter);
+
+        const customReservations = await CustomReservation.aggregate(searchFilter);
+
+        const transferReservations = await TransferReservation.aggregate(transferFilter);
 
         return res.status(200).json({
             ok:true,
+            message:'Reportes de reservas mensual',
             month,
             length:{
                 event:eventReservations.length,
@@ -215,9 +227,6 @@ const getReportsByMonth = async (req, res = response) => {
 
 
 const generateEconomicCalcByDayInMonth = (reservations) => {
-    
-    
-    
     
     let eventDays = [];
     let revenue = {

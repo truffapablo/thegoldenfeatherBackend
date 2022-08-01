@@ -110,7 +110,7 @@ const updateReservation = async (req, res = response) => {
         req.body.event = event;
         const newReservation = {
             ...req.body,
-            user: req.uid,
+            //user: req.uid,
         }
 
         const updatedReservation = await Reservation.findByIdAndUpdate(req.params.id, newReservation, { new: true })
@@ -151,7 +151,7 @@ const confirmReservation = async (req, res = response) => {
         try {
             const newReservation = {
                 ...req.body,
-                user: req.uid,
+                //user: req.uid,
                 status: types.reservationConfirmed,
             }
     
