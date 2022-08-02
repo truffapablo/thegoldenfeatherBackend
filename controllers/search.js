@@ -93,6 +93,8 @@ const advancedSearch = async (req, res = response) => {
                     ok: true,
                     data: clearDuplicatedData(data),
                     filters: [confirmation],
+                    request: [ { confirmation, date, event, lastName }],
+                    length:data.length
                 });
             }
 

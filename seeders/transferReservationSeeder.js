@@ -16,7 +16,7 @@ const transferReservationSeeder = (transfers, id) => {
     
     return [
         {
-            confirmation:       moment().unix()+6,
+            confirmation:       moment().unix()+116,
             origin:             transfers[0].origin,
             destination:        transfers[0].destination,
             transfer:           transfers[0].id,
@@ -34,7 +34,7 @@ const transferReservationSeeder = (transfers, id) => {
             user:               id,
         },
         {
-            confirmation:       moment().unix()+7,
+            confirmation:       moment().unix()+117,
             origin:             transfers[1].origin,
             destination:        transfers[1].destination,
             transfer:           transfers[1].id,
@@ -52,7 +52,7 @@ const transferReservationSeeder = (transfers, id) => {
             user:               id,
         },
         {
-            confirmation:       moment().unix()+8,
+            confirmation:       moment().unix()+118,
             origin:             'Hotel',
             destination:        'Tigre',
             transfer:           null,
