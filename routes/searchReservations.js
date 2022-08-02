@@ -1,6 +1,6 @@
 const express = require('express');
 const { check } = require('express-validator');
-const { searchDataById, advancedSearch } = require('../controllers/search');
+const { searchDataById, advancedSearch, searchDataByConfirmation } = require('../controllers/search');
 const { userAccess } = require('../middlewares/userAccess');
 const router = express.Router();
 const { validateFields } = require('../middlewares/validateFields');
@@ -9,7 +9,11 @@ const { validateJWT } = require('../middlewares/validateJwt');
 router.use(validateJWT);
 router.use(userAccess);
 
-router.get('/:id', searchDataById);
+router.post('/confirmation', [
+    check('confirmation', 'La confirmación debe ser numérica').isNumeric(),
+    validateFields
+
+],searchDataByConfirmation);
 
 router.post('/advanced',[
     check('confimation', 'La confirmación debe ser numérica').isNumeric().optional({ checkFalsy: true, nullable:true }),

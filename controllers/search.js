@@ -32,6 +32,36 @@ const searchDataById = async (req, res = response) => {
     }
 }
 
+const searchDataByConfirmation = async (req, res = response) => {
+    
+    const {confirmation} = req.body;
+    
+    try {
+
+        const data = 
+        await Reservation.findOne({ confirmation }).populate('user', 'name') || 
+        await CustomReservation.findOne({ confirmation}).populate('user', 'name') ||
+        await TransferReservation.findOne({ confirmation}).populate('user', 'name');
+   
+        if (!data) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Data no encontrada',
+            });
+        }
+        return res.status(200).json({
+            ok: true,
+            data,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error, contacte a su administrador',
+        });
+    }
+}
+
 
 const advancedSearch = async (req, res = response) => {
     const { confirmation, date, event, lastName } = req.body;
@@ -40,7 +70,8 @@ const advancedSearch = async (req, res = response) => {
         return res.status(201).json({
             ok: false,
             message: 'Data no encontrada',
-            request: ['Parametros de busqueda', { confirmation, date, event, lastName }],
+            request: [{ confirmation, date, event, lastName }],
+            //request: ['Parametros de busqueda', { confirmation, date, event, lastName }],
         });
     }
 
@@ -68,7 +99,7 @@ const advancedSearch = async (req, res = response) => {
             return res.status(201).json({
                 ok: false,
                 message: `Data no encontrada bajo la confirmación ${confirmation}`,
-                request: ['Parametros de busqueda', { confirmation, date, event, lastName }],
+                request: [ { confirmation, date, event, lastName }],
             });
 
 
@@ -123,7 +154,7 @@ const advancedSearch = async (req, res = response) => {
             return res.status(201).json({
                 ok: false,
                 message: 'Data no encontrada',
-                request: ['Parametros de busqueda', { confirmation, date, event, lastName }],
+                request: [ { confirmation, date, event, lastName }],
             });
         }else if( data.length > 0 ){
             
@@ -145,7 +176,7 @@ const advancedSearch = async (req, res = response) => {
                 ok: true,
                 length: dataUnique.length,
                 filters,
-                request: ['Parametros de busqueda', { confirmation, date, event, lastName }],
+                request: [ { confirmation, date, event, lastName }],
                 data: dataUnique,
             });
         }
@@ -179,4 +210,5 @@ const clearDuplicatedData = (data) => {
 module.exports = {
     searchDataById,
     advancedSearch,
+    searchDataByConfirmation
 }
