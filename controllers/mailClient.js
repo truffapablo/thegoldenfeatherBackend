@@ -8,6 +8,34 @@ const CustomReservation = require("../models/CustomReservation");
 const TransferReservation = require("../models/TransferReservation");
 
 
+
+const infoMail = async (req, res = response) => {
+    try {
+
+        const {email} = req.body;
+        let emailBody = `
+        <h2>Interesado en proyecto.</h2>
+        <br/>
+        <p>El correo ${email} se contactó para recibir más información sobre The Golden Feather.</p>
+        `
+        receiveMailAction(emailBody, email).then(rta=>{
+            console.log('Envio de mail: ', rta);
+        })
+        return res.status(200).json({
+            ok: true,
+            message: 'Email enviado',
+            email
+        });
+
+        
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: 'Error, algo salió mal. Intentá de nuevo a la brevedad.',
+        });
+    }
+}
+
 const mailToClient = async (req, res = response) => {
     
 
@@ -101,6 +129,19 @@ const sendMailAction = async (emailBody, email) => {
     return sendmail;
 }
 
+const receiveMailAction = async (emailBody, email) => {
+    let sendmail = await transporter.sendMail({
+        from: `"${email}"`, // list of receivers
+        to: '"The Golden Feather" <thegoldenfeatherdev@gmail.com>', // receiver address
+        subject: "Info Proyecto", // Subject line
+        html: emailBody, // html body
+      });
+    return sendmail;
+}
+
+
 module.exports = {
-    mailToClient
+    mailToClient,
+    infoMail,
+    receiveMailAction
 }

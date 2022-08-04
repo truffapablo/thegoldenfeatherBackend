@@ -5,18 +5,19 @@ const role = require("../types/role");
 const userSeeder = async () =>{
     const salt = await bcrypt.genSaltSync(10);
     const password = await bcrypt.hashSync("123456", salt);
+    const adminPassword = await bcrypt.hashSync("admin123", salt);
     const userList = [
         {
             name:"Pablo",
-            email:"pablo@thegoldenfeather.com",
+            email:"pablo@thegoldenfeather.dev",
             role:role.admin,
             changePassword:false,
-            password
+            password:adminPassword
 
         },
         {
             name:"Nicolas",
-            email:"nicolas@thegoldenfeather.com",
+            email:"nicolas@thegoldenfeather.dev",
             role:role.employee,
             changePassword:false,
             password
@@ -24,7 +25,7 @@ const userSeeder = async () =>{
         },
         {
             name:"Lucia",
-            email:"lucia@thegoldenfeather.com",
+            email:"lucia@thegoldenfeather.dev",
             role:role.employee,
             changePassword:false,
             password
@@ -32,7 +33,7 @@ const userSeeder = async () =>{
         },
         {
             name:"Fernanda",
-            email:"fernanda@thegoldenfeather.com",
+            email:"fernanda@thegoldenfeather.dev",
             role:role.employee,
             changePassword:false,
             password
