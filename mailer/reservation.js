@@ -8,7 +8,7 @@ const eventReservationMail = (reservation) => {
                 <p>Fecha: ${moment.utc(reservation.date).format('DD-MM-YYYY')}.</p>
                 <p>Evento: ${reservation.event.title}.</p>
                 <p>Cantidad de personas: ${reservation.peopleQuantity}.</p>
-                <p>Precio final por persona: ${reservation.event.currency} ${reservation.peopleQuantity * (reservation.event.price + reservation.event.commission)}.</p>
+                <p>Precio final: ${reservation.event.currency} ${reservation.peopleQuantity * (reservation.event.price + reservation.event.commission)}.</p>
                 <hr/>
                 <h2>Datos importantes del evento al que vas a asistir:</h2>
                 <ul>
